@@ -1,4 +1,3 @@
-// src/ticket-service.ts
 import { randomUUID } from 'node:crypto';
 
 export type Priority = 'LOW' | 'MEDIUM' | 'HIGH';

@@ -71,4 +71,33 @@ describe('TicketRepository', () => {
       'utf-8'
     );
   });
+  it('tìm thấy ticket theo id hoặc trả về null nếu không tồn tại', async () => {
+    
+    vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([sampleTicket]));
+
+    const found = await repository.findById('test-uuid-1');
+    const notFound = await repository.findById('non-existent-id');
+
+    expect(found).toEqual(sampleTicket);
+    expect(notFound).toBeNull();
+  });
+
+  it('cập nhật trạng thái ticket thành công và ném lỗi nếu không tìm thấy id', async () => {
+    // 1. Trường hợp ID không tồn tại
+    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify([sampleTicket]));
+    await expect(repository.updateStatus('fake-id', 'DONE')).rejects.toThrowError('Ticket not found');
+
+    // 2. Trường hợp cập nhật thành công
+    vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify([sampleTicket]));
+    vi.mocked(fs.writeFile).mockResolvedValueOnce(undefined);
+
+    const updated = await repository.updateStatus('test-uuid-1', 'IN_PROGRESS');
+
+    expect(updated.status).toBe('IN_PROGRESS');
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      mockFilePath,
+      JSON.stringify([{ ...sampleTicket, status: 'IN_PROGRESS' }], null, 2),
+      'utf-8'
+    );
+  });
 });
