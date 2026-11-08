@@ -123,5 +123,10 @@ describe('CLI Command Parser', () => {
       'Unknown command: unknown-command'
     );
   });
-  
+  it('lệnh "list --search=<keyword>" lọc ticket theo từ khóa trong title hoặc description', async () => {
+    vi.spyOn(mockRepo, 'getAll').mockResolvedValueOnce(mockTickets);
+    const result = await runCli(['list', '--search=401'], mockRepo);
+    expect(result).toHaveLength(1);
+    expect((result as Ticket[])[0].id).toBe('t-1');
+  });
 });
