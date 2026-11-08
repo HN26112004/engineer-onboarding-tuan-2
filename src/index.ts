@@ -3,10 +3,12 @@ import path from 'node:path';
 import { TicketRepository } from './ticket-repository';
 import { runCli } from './cli';
 
-const DB_PATH = path.resolve(process.cwd(), 'tickets.json');
-const repo = new TicketRepository(DB_PATH);
+// Cho phép cấu hình đường dẫn file DB qua biến môi trường TICKETS_DB_PATH để phục vụ Integration Test
+const DB_PATH = process.env.TICKETS_DB_PATH
+  ? path.resolve(process.env.TICKETS_DB_PATH)
+  : path.resolve(process.cwd(), 'tickets.json');
 
-// Lấy tham số người dùng truyền từ dòng lệnh (bỏ qua node và file path)
+const repo = new TicketRepository(DB_PATH);
 const args = process.argv.slice(2);
 
 async function main() {
