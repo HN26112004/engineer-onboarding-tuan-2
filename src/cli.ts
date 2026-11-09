@@ -81,21 +81,10 @@ export async function runCli(args: string[], repo: TicketRepository) {
     if (rawStatus) filter.status = validateStatus(rawStatus);
     if (rawPriority) filter.priority = validatePriority(rawPriority);
     if (tag) filter.tag = tag;
+    if (search) filter.search = search; // <-- Gán gọn vào filter object
 
     const allTickets = await repo.getAll();
-    const filtered = filterTickets(allTickets, filter);
-
-    // 2. Logic tối thiểu để pass test (nằm tạm ở CLI)
-    if (search) {
-      const keyword = search.toLowerCase();
-      return filtered.filter(
-        (t) =>
-          t.title.toLowerCase().includes(keyword) ||
-          t.description.toLowerCase().includes(keyword)
-      );
-    }
-
-    return filtered;
+    return filterTickets(allTickets, filter);
   }
 
   if (command === 'show') {

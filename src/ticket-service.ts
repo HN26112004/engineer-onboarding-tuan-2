@@ -36,6 +36,7 @@ export interface TicketFilter {
   status?: Status;
   priority?: Priority;
   tag?: string;
+  search?: string; // <-- Thêm trường search vào interface
 }
 
 function sanitizeAndValidateTitle(title?: string): string {
@@ -99,6 +100,17 @@ export function filterTickets(tickets: Ticket[], filter?: TicketFilter): Ticket[
       const ticketTags = (ticket.tags ?? []).map((t) => t.toLowerCase());
       if (!ticketTags.includes(targetTag)) {
         return false;
+      }
+    }
+    // <-- Chuyển logic kiểm tra từ khóa search về hàm filterTickets
+    if (filter.search) {
+      const keyword = filter.search.trim().toLowerCase();
+      if (keyword.length > 0) {
+        const matchTitle = ticket.title.toLowerCase().includes(keyword);
+        const matchDesc = (ticket.description ?? '').toLowerCase().includes(keyword);
+        if (!matchTitle && !matchDesc) {
+          return false;
+        }
       }
     }
     return true;
