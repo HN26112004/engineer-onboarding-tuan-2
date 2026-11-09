@@ -81,20 +81,24 @@ export async function runCli(args: string[], repo: TicketRepository) {
     if (rawStatus) filter.status = validateStatus(rawStatus);
     if (rawPriority) filter.priority = validatePriority(rawPriority);
     if (tag) filter.tag = tag;
+    if (search) filter.search = search;
 
     const allTickets = await repo.getAll();
-    const filtered = filterTickets(allTickets, filter);
+    return filterTickets(allTickets, filter);
+  }if (command === 'list') {
+    const rawStatus = extractOption(args, 'status');
+    const rawPriority = extractOption(args, 'priority');
+    const tag = extractOption(args, 'tag');
+    const search = extractOption(args, 'search');
 
-    if (search) {
-      const keyword = search.toLowerCase();
-      return filtered.filter(
-        (t) =>
-          t.title.toLowerCase().includes(keyword) ||
-          t.description.toLowerCase().includes(keyword)
-      );
-    }
+    const filter: TicketFilter = {};
+    if (rawStatus) filter.status = validateStatus(rawStatus);
+    if (rawPriority) filter.priority = validatePriority(rawPriority);
+    if (tag) filter.tag = tag;
+    if (search) filter.search = search;
 
-    return filtered;
+    const allTickets = await repo.getAll();
+    return filterTickets(allTickets, filter);
   }
 
   if (command === 'show') {
